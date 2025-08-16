@@ -1,0 +1,44 @@
+numpy==1.23.5
+pandas==1.5.3
+opencv-python==4.8.0.74
+Pillow==9.5.0
+
+# DeepFace and Face Recognition
+
+deepface==0.0.93
+mtcnn==0.1.1
+retina-face==0.0.17
+
+# TensorFlow backend for DeepFace
+
+tensorflow==2.12.0
+tensorflow-cpu==2.12.0
+tensorflow-estimator==2.12.0
+keras==2.12.0
+keras-preprocessing==1.1.2
+h5py==3.14.0
+gast==0.4.0
+google-pasta==0.2.0
+absl-py==2.3.1
+opt-einsum==3.4.0
+protobuf==4.25.8
+
+# Utilities
+
+matplotlib==3.7.1
+scipy==1.13.1
+click==8.1.8
+tqdm==4.67.1
+colorama==0.4.6
+requests==2.32.4
+beautifulsoup4==4.13.4
+
+# Optional GUI for file picker
+
+tk==0.1.0
+
+# Optional: HTTP / OAuth (used by DeepFace for downloading models)
+
+oauthlib==3.3.1
+requests-oauthlib==2.0.0
+gdown==5.2.0

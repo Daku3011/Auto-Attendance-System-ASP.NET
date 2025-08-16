@@ -259,7 +259,11 @@ if __name__ == "__main__":
     main()
 
 
+
+
+#--------------------------
 #THIS IS FOR GOOGLE COLLABE
+#--------------------------
 # # !pip install deepface # Already installed in previous cells
 # import os
 # import sys
