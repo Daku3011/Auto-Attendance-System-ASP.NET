@@ -1,4 +1,4 @@
-# 💕 My Boyfriend’s .NET Repo 💕
+# 💕 My Boyfriend’s Personal Repo 💕
 **Made with love, care, and a tiny bit of *territorial* energy.**  
 (*Yes, I’m his girlfriend, and yes, I’m watching you 👀*)
 
