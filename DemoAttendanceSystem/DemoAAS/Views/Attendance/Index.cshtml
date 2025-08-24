@@ -1,0 +1,122 @@
+﻿@model IEnumerable<DemoAAS.Models.Attendance>
+
+@{
+    ViewData["Title"] = "Demo Attendance";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2> Auto Attendance System</h2>
+            <p>Click "Start Camera" to begin the attendance process.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button id="startCameraButton" class="btn btn-primary mt-3">Start Camera</button>
+            <button id="captureButton" class="btn btn-success mt-3" style="display:none;">Capture & Mark Attendance</button>
+        </div>
+    </div>
+
+    <div id="camera-container" class="row justify-content-center mb-4" style="display:none;">
+        <div class="col-md-6">
+            <video id="video" width="100%" height="auto" autoplay playsinline class="border rounded"></video>
+            <div id="statusMessage" class="mt-2 text-center"></div>
+        </div>
+    </div>
+
+    <h3>Attendance Log</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Roll No</th>
+                <th>Status</th>
+                <th>Lecture Time</th>
+                <th>Faculty Name</th>
+                <th>Classroom No</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Student.Name</td>
+                    <td>@item.Student.RollNo</td>
+                    <td><span class="badge bg-success">@item.Status</span></td>
+                    <td>@item.LectureTime.ToString("g")</td>
+                    <td>@item.FacultyName</td>
+                    <td>@item.ClassroomNo</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        const video = document.getElementById('video');
+        const startCameraButton = document.getElementById('startCameraButton');
+        const captureButton = document.getElementById('captureButton');
+        const cameraContainer = document.getElementById('camera-container');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // 1. Event listener to start the camera
+        startCameraButton.addEventListener('click', async () => {
+            statusMessage.textContent = 'Starting camera...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                cameraContainer.style.display = 'flex';
+                captureButton.style.display = 'inline-block';
+                startCameraButton.style.display = 'none';
+                statusMessage.textContent = 'Camera active. Position face in the frame.';
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                statusMessage.textContent = 'Error: Could not access the camera. Please check permissions.';
+                statusMessage.style.color = 'red';
+            }
+        });
+
+        // 2. Event listener for the capture button
+        captureButton.addEventListener('click', () => {
+            statusMessage.textContent = 'Capturing image and marking attendance...';
+
+            // Create a canvas to draw the video frame on
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas image to a Base64 data URL
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            // 3. Send the image data to the server
+            fetch('/Attendance/MarkAttendance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ImageData: imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessage.textContent = data.message;
+                    statusMessage.style.color = 'green';
+                    // Reload the page to show the new attendance record in the table
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000); // Wait 2 seconds before reloading
+                } else {
+                    statusMessage.textContent = 'Error: ' + data.message;
+                    statusMessage.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusMessage.textContent = 'An error occurred while sending data.';
+                statusMessage.style.color = 'red';
+            });
+        });
+    </script>
+}
