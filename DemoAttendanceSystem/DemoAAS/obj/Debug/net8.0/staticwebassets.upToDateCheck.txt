@@ -44,6 +44,7 @@ C:\Users\rdwar\.nuget\packages\bootstrap\5.3.7\contentFiles\any\any\wwwroot\js\b
 C:\Users\rdwar\.nuget\packages\bootstrap\5.3.7\contentFiles\any\any\wwwroot\js\bootstrap.min.js.map
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\haarcascade_frontalface_default.xml
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map

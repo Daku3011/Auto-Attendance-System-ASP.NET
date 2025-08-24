@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DemoAAS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a338219aa6643a7e08acab1b6394cffc897ad437")]
 [assembly: System.Reflection.AssemblyProductAttribute("DemoAAS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DemoAAS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

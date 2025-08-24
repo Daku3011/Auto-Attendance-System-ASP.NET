@@ -75,6 +75,9 @@ namespace DemoAAS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("ReferenceImage")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("RollNo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

@@ -18,5 +18,7 @@ namespace DemoAAS.Models
 
         public string Semester { get; set; } = string.Empty;
         public string Division { get; set; } = string.Empty;
+
+        public byte[]? ReferenceImage { get; set; }
     }
 }

@@ -1,0 +1,40 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<DemoAAS.Models.Student>
+
+<h2>Students</h2>
+<p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Department</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (item.ReferenceImage != null)
+                    {
+                        var base64 = Convert.ToBase64String(item.ReferenceImage);
+                        var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
+                        <img src="@imgSrc" style="max-width: 50px; border-radius: 5px;" />
+                    }
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.RollNo)</td>
+                <td>@Html.DisplayFor(modelItem => item.Department)</td>
+                <td><a asp-action="Edit" asp-route-id="@item.StudentId">Edit</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

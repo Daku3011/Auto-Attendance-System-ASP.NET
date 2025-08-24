@@ -1,72 +1,78 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DemoAAS.Data;
+using DemoAAS.Services;
 using DemoAAS.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace DemoAAS.Controllers
 {
     public class AttendanceController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IFacialRecognitionService _recognitionService;
 
-        public AttendanceController(ApplicationDbContext db)
+        public AttendanceController(ApplicationDbContext db, IFacialRecognitionService recognitionService)
         {
             _db = db;
+            _recognitionService = recognitionService;
         }
 
-        // GET: /Attendance
         public IActionResult Index()
         {
-            // Seed some demo students if none exist
-            if (!_db.Students.Any())
-            {
-                _db.Students.AddRange(
-                    new Student { Name = "Alice", RollNo = "CSE101", Department = "CSE", Semester = "5", Division = "A" },
-                    new Student { Name = "Bob", RollNo = "CSE102", Department = "CSE", Semester = "5", Division = "A" }
-                );
-                _db.SaveChanges();
-            }
-
             var attendanceList = _db.Attendances.Include(a => a.Student).OrderByDescending(a => a.LectureTime).ToList();
             return View(attendanceList);
         }
 
-        // --- FIX APPLIED HERE ---
-        // This attribute tells ASP.NET Core to skip the security token check for this specific action,
-        // allowing our JavaScript fetch request to work without a 400 Bad Request error.
-        [IgnoreAntiforgeryToken]
         [HttpPost]
-        public IActionResult MarkAttendance([FromBody] MarkAttendanceViewModel model)
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> MarkAttendance([FromBody] MarkAttendanceViewModel model)
         {
-            // --- SIMULATION LOGIC ---
-            // In a real application, you would decode the model.ImageData,
-            // run it through a facial recognition model, and find the matching student.
-
-            // For this demo, we'll just pretend we recognized student "Alice".
-            var studentToMark = _db.Students.FirstOrDefault(s => s.RollNo == "CSE101");
-
-            if (studentToMark == null)
+            if (model?.ImageData == null)
             {
-                return Json(new { success = false, message = "Demo student 'Alice' not found." });
+                return Json(new { success = false, message = "No image data received." });
             }
 
-            // Create a new attendance record
-            var newAttendance = new Attendance
+            var base64Data = Regex.Match(model.ImageData, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+            var imageBytes = Convert.FromBase64String(base64Data);
+
+            // 1. Call the new method name: RecognizeStudents
+            var recognizedStudents = await _recognitionService.RecognizeStudents(imageBytes);
+
+            if (recognizedStudents == null || !recognizedStudents.Any())
             {
-                StudentId = studentToMark.StudentId,
-                FacultyName = "Dr. Hetvi", // Or any other demo name
-                LectureTime = DateTime.Now,
-                ClassroomNo = "101-CAM",    // Indicate it came from the camera
-                Status = "Present"
-            };
+                return Json(new { success = false, message = "No registered students were recognized." });
+            }
 
-            _db.Attendances.Add(newAttendance);
-            _db.SaveChanges();
+            // 2. Loop through the list of students returned by the service
+            foreach (var student in recognizedStudents)
+            {
+                var alreadyMarked = await _db.Attendances
+                    .AnyAsync(a => a.StudentId == student.StudentId && a.LectureTime > DateTime.Now.AddMinutes(-5));
 
-            // Return a success message
-            return Json(new { success = true, message = $"Attendance marked for {studentToMark.Name} at {newAttendance.LectureTime}." });
+                if (!alreadyMarked)
+                {
+                    var newAttendance = new Attendance
+                    {
+                        // 3. Access StudentId on the 'student' object inside the loop
+                        StudentId = student.StudentId,
+                        FacultyName = "Ms. Dwakesh",
+                        LectureTime = DateTime.Now,
+                        ClassroomNo = "101-CAM",
+                        Status = "Present"
+                    };
+                    _db.Attendances.Add(newAttendance);
+                }
+            }
+
+            await _db.SaveChangesAsync();
+
+            var names = string.Join(", ", recognizedStudents.Select(s => s.Name));
+            return Json(new { success = true, message = $"Attendance marked for: {names}." });
         }
     }
 }

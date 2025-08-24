@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAAS\\DemoAAS.csproj": {}
+    "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAAS\\DemoAAS.csproj": {
+    "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAAS\\DemoAAS.csproj",
+        "projectUniqueName": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj",
         "projectName": "DemoAAS",
-        "projectPath": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAAS\\DemoAAS.csproj",
+        "projectPath": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj",
         "packagesPath": "C:\\Users\\rdwar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAAS\\obj\\",
+        "outputPath": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -70,7 +70,15 @@
               "target": "Package",
               "version": "[9.0.8, )"
             },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.7, )"
+            },
             "OpenCvSharp4": {
+              "target": "Package",
+              "version": "[4.11.0.20250507, )"
+            },
+            "OpenCvSharp4.Extensions": {
               "target": "Package",
               "version": "[4.11.0.20250507, )"
             },

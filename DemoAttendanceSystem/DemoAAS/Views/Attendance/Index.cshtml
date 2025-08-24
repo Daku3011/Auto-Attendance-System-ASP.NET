@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<DemoAAS.Models.Attendance>
 
 @{
-    ViewData["Title"] = "Demo Attendance";
+    ViewData["Title"] = "Attendance";
 }
 
 <div class="container">
@@ -108,8 +108,30 @@
                         location.reload();
                     }, 2000); // Wait 2 seconds before reloading
                 } else {
-                    statusMessage.textContent = 'Error: ' + data.message;
-                    statusMessage.style.color = 'red';
+                        statusMessage.textContent = 'Error: ' + data.message;
+                        statusMessage.style.color = 'red';
+
+                        // Add a new row to the table to show the failed attempt
+                        const tableBody = document.querySelector('.table tbody');
+                        const newRow = document.createElement('tr');
+                        newRow.style.backgroundColor = '#ffebee'; // A light red to indicate failure
+
+                        const now = new Date();
+                        const formattedTime = now.toLocaleString();
+
+                        newRow.innerHTML = `
+                            <td><strong>Unknown</strong></td>
+                            <td>N/A</td>
+                            <td><span class="badge bg-danger">Failed</span></td>
+                            <td>${formattedTime}</td>
+                            <td>N/A</td>
+                            <td>101-CAM</td>
+                        `;
+                        // Add the new row to the top of the table for immediate feedback
+                        tableBody.prepend(newRow);
+                    //     setTimeout(() => {
+                    //     location.reload();
+                    // }, 2000);
                 }
             })
             .catch(error => {

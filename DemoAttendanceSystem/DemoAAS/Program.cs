@@ -1,4 +1,5 @@
 using DemoAAS.Data;
+using DemoAAS.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,9 @@ builder.Services.AddControllersWithViews();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IFacialRecognitionService, FacialRecognitionService>();
+
 
 var app = builder.Build();
 
