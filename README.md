@@ -1,7 +1,6 @@
 # Auto Attendance System using Facial Recognition
 
 ![Auto Attendance System Demo](https://i.imgur.com/your-demo-gif.gif) 
-*--(Optional: You can create a GIF of your project working and upload it to a site like Imgur to replace this link)--*
 
 This project is a fully functional web application built with **ASP.NET Core MVC** that automates the process of taking attendance using real-time facial recognition. The system captures video from a webcam, detects multiple faces in the frame, and marks attendance by matching them against a database of registered students.
 
@@ -42,8 +41,8 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git)
-    cd YOUR_REPOSITORY_NAME
+    https://github.com/Daku3011/HappyHappy.git
+    cd DemoAttendance
     ```
 
 2.  **Configure the Database Connection:**
@@ -76,7 +75,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     -   **Important:** You must upload a clear, front-facing reference photo for each student for the recognition to work.
 
 2.  **Take Attendance:**
-    -   Navigate to the main attendance page (`/DemoAttendance`).
+    -   Navigate to the main attendance page (`/Attendance/Index`).
     -   Click "Start Camera" and grant the browser permission to use your webcam.
     -   Position one or more registered students in the camera frame.
     -   Click "Capture & Mark Attendance".
