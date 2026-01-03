@@ -1,5 +1,6 @@
 ﻿using DemoAAS.Data;
 using DemoAAS.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenCvSharp;
@@ -7,6 +8,7 @@ using OpenCvSharp.Dnn;
 using OpenCvSharp.Face;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,18 +36,27 @@ namespace DemoAAS.Services
         private const double RECOGNITION_THRESHOLD = 10000; // Increased for more lenient matching
         private const int MIN_FACE_SIZE = 80;
 
-        public FacialRecognitionService(IServiceScopeFactory scopeFactory)
+        public FacialRecognitionService(IServiceScopeFactory scopeFactory, IWebHostEnvironment environment)
         {
             _scopeFactory = scopeFactory;
-            
-            _faceCascade = new CascadeClassifier("haarcascade_frontalface_default.xml");
-            
+
+            var cascadePath = ResolveModelPath("haarcascade_frontalface_default.xml", environment.ContentRootPath)
+                ?? "haarcascade_frontalface_default.xml";
+            _faceCascade = new CascadeClassifier(cascadePath);
+
             try
             {
-                _faceDetectorNet = CvDnn.ReadNetFromCaffe(
-                    "opencv_face_detector.pbtxt",
-                    "opencv_face_detector_uint8.pb"
-                );
+                var dnnConfigPath = ResolveModelPath("opencv_face_detector.pbtxt", environment.ContentRootPath);
+                var dnnWeightsPath = ResolveModelPath("opencv_face_detector_uint8.pb", environment.ContentRootPath);
+
+                if (dnnConfigPath != null && dnnWeightsPath != null)
+                {
+                    _faceDetectorNet = CvDnn.ReadNetFromCaffe(dnnConfigPath, dnnWeightsPath);
+                }
+                else
+                {
+                    Console.WriteLine("Warning: DNN model files missing. Using Haar Cascade only.");
+                }
             }
             catch (Exception ex)
             {
@@ -53,6 +64,18 @@ namespace DemoAAS.Services
             }
             
             _recognizer = EigenFaceRecognizer.Create();
+        }
+
+        private static string? ResolveModelPath(string fileName, string contentRootPath)
+        {
+            var candidates = new[]
+            {
+                Path.Combine(contentRootPath, fileName),
+                Path.Combine(AppContext.BaseDirectory, fileName),
+                Path.Combine(Directory.GetCurrentDirectory(), fileName)
+            };
+
+            return candidates.FirstOrDefault(File.Exists);
         }
 
         private Mat PreprocessFace(Mat faceMat)
