@@ -13,6 +13,7 @@ namespace DemoAAS.Controllers
 {
     public class AttendanceController : Controller
     {
+        private static readonly Regex ImageDataRegex = new Regex(@"data:image/(?<type>.+?),(?<data>.+)", RegexOptions.Compiled);
         private readonly ApplicationDbContext _db;
         private readonly IFacialRecognitionService _recognitionService;
 
@@ -37,8 +38,10 @@ namespace DemoAAS.Controllers
                 return Json(new { success = false, message = "No image data received." });
             }
 
-            var base64Data = Regex.Match(model.ImageData, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-            var imageBytes = Convert.FromBase64String(base64Data);
+            if (!TryGetImageBytes(model.ImageData, out var imageBytes))
+            {
+                return Json(new { success = false, message = "Invalid image data received." });
+            }
 
             // 1. Call the new method name: RecognizeStudents
             var recognizedStudents = await _recognitionService.RecognizeStudents(imageBytes);
@@ -73,6 +76,32 @@ namespace DemoAAS.Controllers
 
             var names = string.Join(", ", recognizedStudents.Select(s => s.Name));
             return Json(new { success = true, message = $"Attendance marked for: {names}." });
+        }
+
+        private static bool TryGetImageBytes(string imageData, out byte[] imageBytes)
+        {
+            imageBytes = Array.Empty<byte>();
+
+            var match = ImageDataRegex.Match(imageData);
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            var base64Data = match.Groups["data"].Value;
+            if (string.IsNullOrWhiteSpace(base64Data))
+            {
+                return false;
+            }
+
+            var buffer = new byte[base64Data.Length];
+            if (!Convert.TryFromBase64String(base64Data, buffer, out var bytesWritten))
+            {
+                return false;
+            }
+
+            imageBytes = buffer[..bytesWritten];
+            return true;
         }
     }
 }

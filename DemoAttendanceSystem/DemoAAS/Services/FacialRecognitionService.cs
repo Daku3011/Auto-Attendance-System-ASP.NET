@@ -1,9 +1,12 @@
 ﻿using DemoAAS.Data;
 using DemoAAS.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using OpenCvSharp;
 using OpenCvSharp.Face;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,22 +17,34 @@ namespace DemoAAS.Services
         Task<List<Student>> RecognizeStudents(byte[] capturedImageBytes);
     }
 
-    public class FacialRecognitionService : IFacialRecognitionService
+    public class FacialRecognitionService : IFacialRecognitionService, IDisposable
     {
         private readonly ApplicationDbContext _context;
         private readonly CascadeClassifier _faceCascade;
         private readonly Size _trainingImageSize = new Size(200, 200);
+        private bool _disposed;
 
-        public FacialRecognitionService(ApplicationDbContext context)
+        public FacialRecognitionService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
-            _faceCascade = new CascadeClassifier("haarcascade_frontalface_default.xml");
+            var cascadePath = Path.Combine(environment.ContentRootPath, "haarcascade_frontalface_default.xml");
+            if (!File.Exists(cascadePath))
+            {
+                throw new FileNotFoundException("Unable to locate the face cascade file.", cascadePath);
+            }
+            _faceCascade = new CascadeClassifier(cascadePath);
         }
 
         public async Task<List<Student>> RecognizeStudents(byte[] capturedImageBytes)
         {
+            if (capturedImageBytes == null || capturedImageBytes.Length == 0)
+            {
+                return new List<Student>();
+            }
+
             var studentsWithImages = await _context.Students
-                .Where(s => s.ReferenceImage != null)
+                .AsNoTracking()
+                .Where(s => s.ReferenceImage != null && s.ReferenceImage.Length > 0)
                 .ToListAsync();
 
             if (!studentsWithImages.Any())
@@ -37,57 +52,55 @@ namespace DemoAAS.Services
                 return new List<Student>();
             }
 
-            var recognizer = LBPHFaceRecognizer.Create();
-
             var labels = new List<int>();
             var mats = new List<Mat>();
 
-            // --- CORE LOGIC CHANGE: Process reference images before training ---
-            foreach (var student in studentsWithImages)
+            try
             {
-                using (var mat = Mat.FromImageData(student.ReferenceImage, ImreadModes.Grayscale))
+                // --- CORE LOGIC CHANGE: Process reference images before training ---
+                foreach (var student in studentsWithImages)
                 {
+                    using var mat = Mat.FromImageData(student.ReferenceImage, ImreadModes.Grayscale);
+
                     // 1. Detect faces in the reference image
                     var facesInReference = _faceCascade.DetectMultiScale(mat);
                     if (facesInReference.Length > 0)
                     {
                         // 2. Assume the largest face is the student's and crop it
                         var largestFaceRect = facesInReference.OrderByDescending(f => f.Width * f.Height).First();
-                        using (var croppedFace = new Mat(mat, largestFaceRect))
-                        {
-                            // 3. Resize the cropped face to a standard size for training
-                            var resizedMat = croppedFace.Resize(_trainingImageSize);
-                            mats.Add(resizedMat);
-                            labels.Add(student.StudentId);
-                        }
+                        using var croppedFace = new Mat(mat, largestFaceRect);
+
+                        // 3. Resize the cropped face to a standard size for training
+                        var resizedMat = croppedFace.Resize(_trainingImageSize);
+                        mats.Add(resizedMat);
+                        labels.Add(student.StudentId);
                     }
                     // If no face is found in the reference image, it will be skipped.
                 }
-            }
 
-            // Ensure we have something to train before proceeding
-            if (!mats.Any())
-            {
-                return new List<Student>();
-            }
-
-            recognizer.Train(mats, labels);
-
-            var capturedMat = Mat.FromImageData(capturedImageBytes, ImreadModes.Grayscale);
-            var faces = _faceCascade.DetectMultiScale(capturedMat, 1.1, 5, HaarDetectionTypes.ScaleImage);
-
-            if (faces.Length == 0)
-            {
-                return new List<Student>();
-            }
-
-            var recognizedStudents = new List<Student>();
-
-            foreach (var faceRect in faces)
-            {
-                using (var capturedFaceMat = new Mat(capturedMat, faceRect))
+                // Ensure we have something to train before proceeding
+                if (!mats.Any())
                 {
-                    var resizedCapturedFace = capturedFaceMat.Resize(_trainingImageSize);
+                    return new List<Student>();
+                }
+
+                using var recognizer = LBPHFaceRecognizer.Create();
+                recognizer.Train(mats, labels);
+
+                using var capturedMat = Mat.FromImageData(capturedImageBytes, ImreadModes.Grayscale);
+                var faces = _faceCascade.DetectMultiScale(capturedMat, 1.1, 5, HaarDetectionTypes.ScaleImage);
+
+                if (faces.Length == 0)
+                {
+                    return new List<Student>();
+                }
+
+                var recognizedStudents = new List<Student>();
+
+                foreach (var faceRect in faces)
+                {
+                    using var capturedFaceMat = new Mat(capturedMat, faceRect);
+                    using var resizedCapturedFace = capturedFaceMat.Resize(_trainingImageSize);
                     recognizer.Predict(resizedCapturedFace, out int predictedLabel, out double confidence);
 
                     if (confidence < 70)
@@ -99,17 +112,27 @@ namespace DemoAAS.Services
                         }
                     }
                 }
-            }
 
-            // Dispose of Mats to prevent memory leaks
-            foreach (var mat in mats)
+                return recognizedStudents;
+            }
+            finally
             {
-                mat.Dispose();
+                foreach (var mat in mats)
+                {
+                    mat.Dispose();
+                }
             }
-            capturedMat.Dispose();
-            recognizer.Dispose();
+        }
 
-            return recognizedStudents;
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _faceCascade.Dispose();
+            _disposed = true;
         }
     }
 }
