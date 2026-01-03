@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj": {}
+    "/mnt/B224FAB124FA77A5/OEP/HappyHappy/DemoAttendanceSystem/DemoAAS/DemoAAS.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj": {
+    "/mnt/B224FAB124FA77A5/OEP/HappyHappy/DemoAttendanceSystem/DemoAAS/DemoAAS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj",
+        "projectUniqueName": "/mnt/B224FAB124FA77A5/OEP/HappyHappy/DemoAttendanceSystem/DemoAAS/DemoAAS.csproj",
         "projectName": "DemoAAS",
-        "projectPath": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\DemoAAS.csproj",
-        "packagesPath": "C:\\Users\\rdwar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rdwar\\source\\repos\\DemoAAS\\DemoAttendanceSystem\\DemoAAS\\obj\\",
+        "projectPath": "/mnt/B224FAB124FA77A5/OEP/HappyHappy/DemoAttendanceSystem/DemoAAS/DemoAAS.csproj",
+        "packagesPath": "/home/dwarkeshramani/.nuget/packages/",
+        "outputPath": "/mnt/B224FAB124FA77A5/OEP/HappyHappy/DemoAttendanceSystem/DemoAAS/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\rdwar\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/dwarkeshramani/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,13 +32,7 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -60,10 +48,6 @@
               "target": "Package",
               "version": "[9.0.8, )"
             },
-            "Microsoft.EntityFrameworkCore.SqlServer": {
-              "target": "Package",
-              "version": "[9.0.8, )"
-            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
@@ -74,17 +58,21 @@
               "target": "Package",
               "version": "[8.0.7, )"
             },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.1, )"
+            },
             "OpenCvSharp4": {
               "target": "Package",
-              "version": "[4.11.0.20250507, )"
+              "version": "[4.10.0.20240717, )"
             },
             "OpenCvSharp4.Extensions": {
               "target": "Package",
-              "version": "[4.11.0.20250507, )"
+              "version": "[4.10.0.20240717, )"
             },
-            "OpenCvSharp4.runtime.win": {
+            "OpenCvSharp4.runtime.linux-x64": {
               "target": "Package",
-              "version": "[4.11.0.20250507, )"
+              "version": "[4.10.0.20240717, )"
             },
             "bootstrap": {
               "target": "Package",
@@ -110,7 +98,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.121/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

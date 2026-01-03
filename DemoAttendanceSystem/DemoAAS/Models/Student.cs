@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace DemoAAS.Models
 {
@@ -20,5 +21,8 @@ namespace DemoAAS.Models
         public string Division { get; set; } = string.Empty;
 
         public byte[]? ReferenceImage { get; set; }
+        
+        // Navigation property for multiple photos
+        public virtual ICollection<StudentPhoto> Photos { get; set; } = new List<StudentPhoto>();
     }
 }

@@ -12,5 +12,6 @@ namespace DemoAAS.Data
 
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Attendance> Attendances { get; set; } = null!;
+        public DbSet<StudentPhoto> StudentPhotos { get; set; } = null!;
     }
 }

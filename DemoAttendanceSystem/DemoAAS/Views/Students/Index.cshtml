@@ -34,6 +34,7 @@
                 <td>@Html.DisplayFor(modelItem => item.RollNo)</td>
                 <td>@Html.DisplayFor(modelItem => item.Department)</td>
                 <td><a asp-action="Edit" asp-route-id="@item.StudentId">Edit</a></td>
+                <td><a asp-action="Delete" asp-route-id="@item.StudentId">Delete</a></td>
             </tr>
         }
     </tbody>

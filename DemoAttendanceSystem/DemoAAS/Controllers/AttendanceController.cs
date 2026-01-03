@@ -3,29 +3,75 @@ using DemoAAS.Data;
 using DemoAAS.Services;
 using DemoAAS.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using OpenCvSharp;
 
 namespace DemoAAS.Controllers
 {
     public class AttendanceController : Controller
     {
-        private static readonly Regex ImageDataRegex = new Regex(@"data:image/(?<type>.+?),(?<data>.+)", RegexOptions.Compiled);
         private readonly ApplicationDbContext _db;
         private readonly IFacialRecognitionService _recognitionService;
+        private readonly IConfiguration _configuration;
 
-        public AttendanceController(ApplicationDbContext db, IFacialRecognitionService recognitionService)
+        public AttendanceController(ApplicationDbContext db, IFacialRecognitionService recognitionService, IConfiguration configuration)
         {
             _db = db;
             _recognitionService = recognitionService;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
         {
-            var attendanceList = _db.Attendances.Include(a => a.Student).OrderByDescending(a => a.LectureTime).ToList();
+            return View();
+        }
+
+        // GET: Attendance/Records
+        public IActionResult Records(string? classroom, string? faculty, DateTime? fromDate, DateTime? toDate)
+        {
+            var query = _db.Attendances
+                .Include(a => a.Student)
+                .AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(classroom))
+            {
+                query = query.Where(a => a.ClassroomNo.Contains(classroom));
+            }
+
+            if (!string.IsNullOrEmpty(faculty))
+            {
+                query = query.Where(a => a.FacultyName.Contains(faculty));
+            }
+
+            if (fromDate.HasValue)
+            {
+                var fromDateUtc = fromDate.Value.ToUniversalTime();
+                query = query.Where(a => a.LectureTime >= fromDateUtc);
+            }
+
+            if (toDate.HasValue)
+            {
+                var toDateUtc = toDate.Value.AddDays(1).ToUniversalTime(); // Include entire day
+                query = query.Where(a => a.LectureTime < toDateUtc);
+            }
+
+            var attendanceList = query
+                .OrderByDescending(a => a.LectureTime)
+                .Take(100) // Limit to 100 records
+                .ToList();
+
+            // Pass filter values to view
+            ViewBag.Classroom = classroom;
+            ViewBag.Faculty = faculty;
+            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+
             return View(attendanceList);
         }
 
@@ -38,10 +84,8 @@ namespace DemoAAS.Controllers
                 return Json(new { success = false, message = "No image data received." });
             }
 
-            if (!TryGetImageBytes(model.ImageData, out var imageBytes))
-            {
-                return Json(new { success = false, message = "Invalid image data received." });
-            }
+            var base64Data = Regex.Match(model.ImageData, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+            var imageBytes = Convert.FromBase64String(base64Data);
 
             // 1. Call the new method name: RecognizeStudents
             var recognizedStudents = await _recognitionService.RecognizeStudents(imageBytes);
@@ -55,7 +99,7 @@ namespace DemoAAS.Controllers
             foreach (var student in recognizedStudents)
             {
                 var alreadyMarked = await _db.Attendances
-                    .AnyAsync(a => a.StudentId == student.StudentId && a.LectureTime > DateTime.Now.AddMinutes(-5));
+                    .AnyAsync(a => a.StudentId == student.StudentId && a.LectureTime > DateTime.UtcNow.AddMinutes(-5));
 
                 if (!alreadyMarked)
                 {
@@ -63,9 +107,9 @@ namespace DemoAAS.Controllers
                     {
                         // 3. Access StudentId on the 'student' object inside the loop
                         StudentId = student.StudentId,
-                        FacultyName = "Ms. Dwakesh",
-                        LectureTime = DateTime.Now,
-                        ClassroomNo = "101-CAM",
+                        FacultyName = _configuration["AttendanceSettings:FacultyName"] ?? "Unknown Faculty",
+                        LectureTime = DateTime.UtcNow,
+                        ClassroomNo = _configuration["AttendanceSettings:ClassroomNo"] ?? "Unknown Class",
                         Status = "Present"
                     };
                     _db.Attendances.Add(newAttendance);
@@ -78,30 +122,66 @@ namespace DemoAAS.Controllers
             return Json(new { success = true, message = $"Attendance marked for: {names}." });
         }
 
-        private static bool TryGetImageBytes(string imageData, out byte[] imageBytes)
+        public IActionResult Classroom()
         {
-            imageBytes = Array.Empty<byte>();
+            return View();
+        }
 
-            var match = ImageDataRegex.Match(imageData);
-            if (!match.Success)
+        [HttpGet]
+        public async Task StreamFeed(string rtspUrl)
+        {
+            if (string.IsNullOrEmpty(rtspUrl))
             {
-                return false;
+                Response.StatusCode = 400;
+                return;
             }
 
-            var base64Data = match.Groups["data"].Value;
-            if (string.IsNullOrWhiteSpace(base64Data))
-            {
-                return false;
-            }
+            Response.Headers.Append("Content-Type", "multipart/x-mixed-replace; boundary=frame");
 
-            var buffer = new byte[base64Data.Length];
-            if (!Convert.TryFromBase64String(base64Data, buffer, out var bytesWritten))
+            // Run in a separate task to avoid blocking the request thread? 
+            // Actually, we are writing to the response body, so we must stay on this thread.
+            // But VideoCapture might block.
+            
+            using (var capture = new VideoCapture(rtspUrl))
             {
-                return false;
-            }
+                if (!capture.IsOpened())
+                {
+                    // Handle error
+                    return;
+                }
 
-            imageBytes = buffer[..bytesWritten];
-            return true;
+                using (var frame = new Mat())
+                {
+                    while (!HttpContext.RequestAborted.IsCancellationRequested)
+                    {
+                        if (capture.Read(frame) && !frame.Empty())
+                        {
+                            // Optional: Resize for performance
+                            // Cv2.Resize(frame, frame, new Size(640, 480));
+
+                            // Encode to JPEG
+                            var imageBytes = frame.ImEncode(".jpg");
+
+                            // Write boundary and headers
+                            var header = $"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: {imageBytes.Length}\r\n\r\n";
+                            var headerBytes = System.Text.Encoding.ASCII.GetBytes(header);
+                            
+                            await Response.Body.WriteAsync(headerBytes, 0, headerBytes.Length);
+                            await Response.Body.WriteAsync(imageBytes, 0, imageBytes.Length);
+                            await Response.Body.WriteAsync(System.Text.Encoding.ASCII.GetBytes("\r\n"), 0, 2);
+
+                            // Control frame rate (approx 15 FPS)
+                            await Task.Delay(66); 
+                        }
+                        else
+                        {
+                            // If stream ends or fails, wait a bit and try again or break
+                            await Task.Delay(1000);
+                            if (!capture.IsOpened()) break;
+                        }
+                    }
+                }
+            }
         }
     }
 }

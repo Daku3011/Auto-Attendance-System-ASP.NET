@@ -9,9 +9,9 @@ builder.Services.AddControllersWithViews();
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IFacialRecognitionService, FacialRecognitionService>();
+builder.Services.AddSingleton<IFacialRecognitionService, FacialRecognitionService>();
 
 
 var app = builder.Build();

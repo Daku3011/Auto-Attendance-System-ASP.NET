@@ -1,54 +1,44 @@
-﻿@model IEnumerable<DemoAAS.Models.Attendance>
-
+﻿
 @{
     ViewData["Title"] = "Attendance";
 }
 
-<div class="container">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2> Auto Attendance System</h2>
-            <p>Click "Start Camera" to begin the attendance process.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3">Auto Attendance System</h1>
+            <p class="lead text-muted">Seamlessly mark attendance using facial recognition.</p>
         </div>
-        <div class="col-md-4 text-md-end">
-            <button id="startCameraButton" class="btn btn-primary mt-3">Start Camera</button>
-            <button id="captureButton" class="btn btn-success mt-3" style="display:none;">Capture & Mark Attendance</button>
+
+        <div class="glass-card p-4 mb-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3 class="mb-1">Camera Feed</h3>
+                    <p class="text-muted mb-0">Ensure your face is clearly visible within the frame.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button id="startCameraButton" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video-fill me-2" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.461a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5z"/>
+                        </svg>
+                        Start Camera
+                    </button>
+                    <button id="captureButton" class="btn btn-success pulse-animation" style="display:none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-bounding-box me-2" viewBox="0 0 16 16">
+                          <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
+                          <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        </svg>
+                        Mark Attendance
+                    </button>
+                </div>
+            </div>
+
+            <div id="camera-container" class="mt-4" style="display:none;">
+                <video id="video" autoplay playsinline></video>
+                <div id="statusMessage" class="mt-3 text-center fw-bold"></div>
+            </div>
         </div>
     </div>
-
-    <div id="camera-container" class="row justify-content-center mb-4" style="display:none;">
-        <div class="col-md-6">
-            <video id="video" width="100%" height="auto" autoplay playsinline class="border rounded"></video>
-            <div id="statusMessage" class="mt-2 text-center"></div>
-        </div>
-    </div>
-
-    <h3>Attendance Log</h3>
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th>Roll No</th>
-                <th>Status</th>
-                <th>Lecture Time</th>
-                <th>Faculty Name</th>
-                <th>Classroom No</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Student.Name</td>
-                    <td>@item.Student.RollNo</td>
-                    <td><span class="badge bg-success">@item.Status</span></td>
-                    <td>@item.LectureTime.ToString("g")</td>
-                    <td>@item.FacultyName</td>
-                    <td>@item.ClassroomNo</td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>
 
 @section Scripts {
@@ -59,38 +49,38 @@
         const cameraContainer = document.getElementById('camera-container');
         const statusMessage = document.getElementById('statusMessage');
 
-        // 1. Event listener to start the camera
         startCameraButton.addEventListener('click', async () => {
-            statusMessage.textContent = 'Starting camera...';
+            statusMessage.textContent = 'Initializing camera...';
+            statusMessage.className = 'mt-3 text-center fw-bold text-info';
+            
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
-                cameraContainer.style.display = 'flex';
+                cameraContainer.style.display = 'block';
                 captureButton.style.display = 'inline-block';
                 startCameraButton.style.display = 'none';
-                statusMessage.textContent = 'Camera active. Position face in the frame.';
+                statusMessage.textContent = 'Camera active. Position your face within the frame.';
+                statusMessage.className = 'mt-3 text-center fw-bold text-success';
             } catch (err) {
                 console.error("Error accessing camera: ", err);
                 statusMessage.textContent = 'Error: Could not access the camera. Please check permissions.';
-                statusMessage.style.color = 'red';
+                statusMessage.className = 'mt-3 text-center fw-bold text-danger';
             }
         });
 
-        // 2. Event listener for the capture button
         captureButton.addEventListener('click', () => {
-            statusMessage.textContent = 'Capturing image and marking attendance...';
+            statusMessage.textContent = 'Processing...';
+            statusMessage.className = 'mt-3 text-center fw-bold text-warning';
+            captureButton.disabled = true;
 
-            // Create a canvas to draw the video frame on
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convert the canvas image to a Base64 data URL
             const imageData = canvas.toDataURL('image/jpeg');
 
-            // 3. Send the image data to the server
             fetch('/Attendance/MarkAttendance', {
                 method: 'POST',
                 headers: {
@@ -102,42 +92,21 @@
             .then(data => {
                 if (data.success) {
                     statusMessage.textContent = data.message;
-                    statusMessage.style.color = 'green';
-                    // Reload the page to show the new attendance record in the table
+                    statusMessage.className = 'mt-3 text-center fw-bold text-success';
                     setTimeout(() => {
                         location.reload();
-                    }, 2000); // Wait 2 seconds before reloading
+                    }, 1500);
                 } else {
-                        statusMessage.textContent = 'Error: ' + data.message;
-                        statusMessage.style.color = 'red';
-
-                        // Add a new row to the table to show the failed attempt
-                        const tableBody = document.querySelector('.table tbody');
-                        const newRow = document.createElement('tr');
-                        newRow.style.backgroundColor = '#ffebee'; // A light red to indicate failure
-
-                        const now = new Date();
-                        const formattedTime = now.toLocaleString();
-
-                        newRow.innerHTML = `
-                            <td><strong>Unknown</strong></td>
-                            <td>N/A</td>
-                            <td><span class="badge bg-danger">Failed</span></td>
-                            <td>${formattedTime}</td>
-                            <td>N/A</td>
-                            <td>101-CAM</td>
-                        `;
-                        // Add the new row to the top of the table for immediate feedback
-                        tableBody.prepend(newRow);
-                    //     setTimeout(() => {
-                    //     location.reload();
-                    // }, 2000);
+                    statusMessage.textContent = data.message;
+                    statusMessage.className = 'mt-3 text-center fw-bold text-danger';
+                    captureButton.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                statusMessage.textContent = 'An error occurred while sending data.';
-                statusMessage.style.color = 'red';
+                statusMessage.textContent = 'An error occurred while communicating with the server.';
+                statusMessage.className = 'mt-3 text-center fw-bold text-danger';
+                captureButton.disabled = false;
             });
         });
     </script>

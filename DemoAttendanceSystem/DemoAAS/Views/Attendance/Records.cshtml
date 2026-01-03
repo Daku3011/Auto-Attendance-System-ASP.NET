@@ -1,0 +1,107 @@
+@model IEnumerable<DemoAAS.Models.Attendance>
+
+@{
+    ViewData["Title"] = "Attendance Records";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold mb-2">Attendance Records</h1>
+            <p class="text-muted">View and filter attendance history</p>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="glass-card p-4 mb-4">
+            <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filters</h5>
+            <form asp-action="Records" method="get">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Classroom</label>
+                        <input type="text" name="classroom" class="form-control" placeholder="e.g., 101" value="@ViewBag.Classroom">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Faculty</label>
+                        <input type="text" name="faculty" class="form-control" placeholder="Faculty name" value="@ViewBag.Faculty">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">From Date</label>
+                        <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">To Date</label>
+                        <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-search me-1"></i>Filter
+                        </button>
+                        <a asp-action="Records" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Card -->
+        <div class="glass-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-table me-2"></i>Records 
+                    <span class="badge bg-primary ms-2">@Model.Count()</span>
+                </h5>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Roll No</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Date & Time</th>
+                                <th>Faculty</th>
+                                <th>Classroom</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@item.Student.Name</td>
+                                    <td>@item.Student.RollNo</td>
+                                    <td>@item.Student.Department</td>
+                                    <td>
+                                        <span class="badge bg-success rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i>@item.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div>@item.LectureTime.ToLocalTime().ToString("dd MMM yyyy")</div>
+                                        <small class="text-muted">@item.LectureTime.ToLocalTime().ToString("hh:mm tt")</small>
+                                    </td>
+                                    <td>@item.FacultyName</td>
+                                    <td>
+                                        <span class="badge bg-info">@item.ClassroomNo</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <p class="text-muted mt-3">No attendance records found</p>
+                    <p class="text-muted">Try adjusting your filters or <a asp-action="Records">clear all filters</a></p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

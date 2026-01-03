@@ -1,1 +1,8 @@
-".vs/" 
+.vs/
+bin/
+obj/
+*.backup
+*.user
+.vscode/
+__pycache__/
+*.log

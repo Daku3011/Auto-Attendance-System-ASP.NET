@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Classroom Camera";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">Classroom Mode</h1>
+    <p class="lead text-muted">Connect to a classroom camera via RTSP.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="glass-card p-4 mb-4">
+            <div class="mb-3">
+                <label for="rtspUrl" class="form-label">RTSP URL</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="rtspUrl" placeholder="rtsp://username:password@ip:port/stream" value="rtsp://">
+                    <button class="btn btn-primary" type="button" id="btnConnect">Connect</button>
+                </div>
+                <div class="form-text text-muted">Enter the full RTSP URL of your IP camera.</div>
+            </div>
+        </div>
+
+        <div class="glass-card p-2 text-center" id="streamContainer" style="display: none;">
+            <div class="position-relative">
+                <img id="cameraStream" src="" alt="Camera Stream" style="width: 100%; border-radius: 12px;" />
+                <div class="position-absolute top-0 end-0 m-3">
+                    <span class="badge bg-danger pulse-animation">LIVE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#btnConnect').click(function () {
+                var url = $('#rtspUrl').val();
+                if (url) {
+                    var streamUrl = '@Url.Action("StreamFeed", "Attendance")' + '?rtspUrl=' + encodeURIComponent(url);
+                    $('#cameraStream').attr('src', streamUrl);
+                    $('#streamContainer').fadeIn();
+                } else {
+                    alert("Please enter a valid RTSP URL.");
+                }
+            });
+        });
+    </script>
+}

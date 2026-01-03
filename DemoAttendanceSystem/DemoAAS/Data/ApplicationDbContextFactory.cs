@@ -8,7 +8,7 @@ namespace DemoAAS.Data
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=AutoAttendanceDB;Trusted_Connection=True;Encrypt=False;");
+            optionsBuilder.UseNpgsql("Host=localhost;Database=DemoAAS;Username=postgres;Password=daku123$");
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }
