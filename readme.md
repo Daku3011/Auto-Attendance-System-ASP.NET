@@ -13,8 +13,6 @@
 
 A production-ready web application that automates classroom attendance using **deep-learning face recognition**. Capture a photo, detect every face in the frame, and instantly mark attendance — all in real time.
 
-</div>
-
 ---
 
 ## 🧠 How It Works
@@ -188,16 +186,3 @@ Contributions are welcome! Please open an issue first to discuss what you'd like
 5. Open a Pull Request
 
 ---
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see [LICENSE.md](LICENSE.md) for details.
-
----
-
-<div align="center">
-
-**Built with ❤️ by [Daku3011](https://github.com/Daku3011)**
-
-</div>
-]]>
