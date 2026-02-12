@@ -18,12 +18,14 @@ namespace DemoAAS.Controllers
         private readonly ApplicationDbContext _db;
         private readonly IFacialRecognitionService _recognitionService;
         private readonly IConfiguration _configuration;
+        private readonly Microsoft.AspNetCore.SignalR.IHubContext<DemoAAS.Hubs.AttendanceHub> _hubContext;
 
-        public AttendanceController(ApplicationDbContext db, IFacialRecognitionService recognitionService, IConfiguration configuration)
+        public AttendanceController(ApplicationDbContext db, IFacialRecognitionService recognitionService, IConfiguration configuration, Microsoft.AspNetCore.SignalR.IHubContext<DemoAAS.Hubs.AttendanceHub> hubContext)
         {
             _db = db;
             _recognitionService = recognitionService;
             _configuration = configuration;
+            _hubContext = hubContext;
         }
 
         public IActionResult Index()
@@ -113,6 +115,9 @@ namespace DemoAAS.Controllers
                         Status = "Present"
                     };
                     _db.Attendances.Add(newAttendance);
+                    
+                    // Broadcast the update via SignalR
+                    await _hubContext.Clients.All.SendAsync("ReceiveAttendanceUpdate", student.Name, "Present");
                 }
             }
 
@@ -120,6 +125,30 @@ namespace DemoAAS.Controllers
 
             var names = string.Join(", ", recognizedStudents.Select(s => s.Name));
             return Json(new { success = true, message = $"Attendance marked for: {names}." });
+        }
+
+        public IActionResult ExportToCsv(string? classroom, string? faculty, DateTime? fromDate, DateTime? toDate)
+        {
+            var query = _db.Attendances
+                .Include(a => a.Student)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(classroom)) query = query.Where(a => a.ClassroomNo.Contains(classroom));
+            if (!string.IsNullOrEmpty(faculty)) query = query.Where(a => a.FacultyName.Contains(faculty));
+            if (fromDate.HasValue) query = query.Where(a => a.LectureTime >= fromDate.Value.ToUniversalTime());
+            if (toDate.HasValue) query = query.Where(a => a.LectureTime < toDate.Value.AddDays(1).ToUniversalTime());
+
+            var records = query.OrderByDescending(a => a.LectureTime).ToList();
+
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Student Name,Roll No,Department,Classroom,Faculty,Lecture Time,Status");
+
+            foreach (var record in records)
+            {
+                csv.AppendLine($"{record.Student?.Name},{record.Student?.RollNo},{record.Student?.Department},{record.ClassroomNo},{record.FacultyName},{record.LectureTime:yyyy-MM-dd HH:mm:ss}, {record.Status}");
+            }
+
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", $"Attendance_Report_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
         }
 
         public IActionResult Classroom()

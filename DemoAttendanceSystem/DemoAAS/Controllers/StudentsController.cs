@@ -8,16 +8,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DemoAAS.Controllers
 {
+    [Authorize]
     public class StudentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly DemoAAS.Services.IFacialRecognitionService _recognitionService;
 
-        public StudentsController(ApplicationDbContext context)
+        public StudentsController(ApplicationDbContext context, DemoAAS.Services.IFacialRecognitionService recognitionService)
         {
             _context = context;
+            _recognitionService = recognitionService;
         }
 
         // GET: Students
@@ -78,6 +82,7 @@ namespace DemoAAS.Controllers
                         }
                     }
                     await _context.SaveChangesAsync();
+                    _recognitionService.TriggerTraining();
                 }
                 
                 return RedirectToAction(nameof(Index));
@@ -149,6 +154,7 @@ namespace DemoAAS.Controllers
                     }
                     
                     await _context.SaveChangesAsync();
+                    _recognitionService.TriggerTraining();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

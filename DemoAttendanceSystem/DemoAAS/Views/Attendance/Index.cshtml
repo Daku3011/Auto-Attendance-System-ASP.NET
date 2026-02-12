@@ -10,67 +10,121 @@
             <p class="lead text-muted">Seamlessly mark attendance using facial recognition.</p>
         </div>
 
-        <div class="glass-card p-4 mb-5">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h3 class="mb-1">Camera Feed</h3>
-                    <p class="text-muted mb-0">Ensure your face is clearly visible within the frame.</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <button id="startCameraButton" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video-fill me-2" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.461a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5z"/>
-                        </svg>
-                        Start Camera
-                    </button>
-                    <button id="captureButton" class="btn btn-success pulse-animation" style="display:none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-bounding-box me-2" viewBox="0 0 16 16">
-                          <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
-                          <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                        </svg>
-                        Mark Attendance
-                    </button>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="glass-card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h3 class="mb-1">Camera Feed</h3>
+                            <p class="text-muted mb-0">Position your face within the frame.</p>
+                        </div>
+                        <div>
+                            <button id="startCameraButton" class="btn btn-primary btn-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-camera-video-fill me-2" viewBox="0 0 16 16">
+                                  <path fill-rule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.461a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5z"/>
+                                </svg>
+                                Start
+                            </button>
+                            <button id="captureButton" class="btn btn-success btn-lg pulse-animation" style="display:none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-bounding-box me-2" viewBox="0 0 16 16">
+                                  <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
+                                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                </svg>
+                                Mark Attendance
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="camera-container" style="display:none; position: relative;">
+                        <video id="video" autoplay playsinline class="rounded shadow-sm w-100"></video>
+                        <canvas id="overlay" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                        <div id="statusMessage" class="mt-3 text-center fw-bold p-2 rounded"></div>
+                    </div>
                 </div>
             </div>
 
-            <div id="camera-container" class="mt-4" style="display:none;">
-                <video id="video" autoplay playsinline></video>
-                <div id="statusMessage" class="mt-3 text-center fw-bold"></div>
+            <div class="col-md-5">
+                <div class="glass-card p-4 h-100">
+                    <h3 class="mb-4">Recent Attendance</h3>
+                    <div id="recentAttendanceList" class="list-group list-group-flush overflow-auto" style="max-height: 500px;">
+                        <div class="text-center text-muted p-4 small" id="noRecordsMsg">
+                            No records in this session yet.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script>
         const video = document.getElementById('video');
         const startCameraButton = document.getElementById('startCameraButton');
         const captureButton = document.getElementById('captureButton');
         const cameraContainer = document.getElementById('camera-container');
         const statusMessage = document.getElementById('statusMessage');
+        const recentAttendanceList = document.getElementById('recentAttendanceList');
+        const noRecordsMsg = document.getElementById('noRecordsMsg');
+
+        // SignalR Connection
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/attendanceHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveAttendanceUpdate", (studentName, status) => {
+            addAttendanceRecord(studentName, status);
+        });
+
+        connection.start().catch(err => console.error("SignalR logic failed: ", err));
+
+        function addAttendanceRecord(name, status) {
+            if (noRecordsMsg) noRecordsMsg.remove();
+            
+            const html = `
+                <div class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center animate__animated animate__fadeIn">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success-subtle p-2 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-check text-success" viewBox="0 0 16 16">
+                              <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.513ZM11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 1 0 4Z"/>
+                              <path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.477 9.05 8.828 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 text-white">${name}</h6>
+                            <small class="text-muted-light">${new Date().toLocaleTimeString()}</small>
+                        </div>
+                    </div>
+                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle">Present</span>
+                </div>`;
+            
+            recentAttendanceList.insertAdjacentHTML('afterbegin', html);
+        }
 
         startCameraButton.addEventListener('click', async () => {
             statusMessage.textContent = 'Initializing camera...';
-            statusMessage.className = 'mt-3 text-center fw-bold text-info';
+            statusMessage.className = 'mt-3 text-center fw-bold text-info bg-dark-subtle';
             
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
                 video.srcObject = stream;
                 cameraContainer.style.display = 'block';
                 captureButton.style.display = 'inline-block';
                 startCameraButton.style.display = 'none';
-                statusMessage.textContent = 'Camera active. Position your face within the frame.';
-                statusMessage.className = 'mt-3 text-center fw-bold text-success';
+                statusMessage.textContent = 'Camera active. Position your face in the frame.';
+                statusMessage.className = 'mt-3 text-center fw-bold text-success bg-dark-subtle';
             } catch (err) {
                 console.error("Error accessing camera: ", err);
-                statusMessage.textContent = 'Error: Could not access the camera. Please check permissions.';
-                statusMessage.className = 'mt-3 text-center fw-bold text-danger';
+                statusMessage.textContent = 'Error: Could not access camera.';
+                statusMessage.className = 'mt-3 text-center fw-bold text-danger bg-dark-subtle';
             }
         });
 
         captureButton.addEventListener('click', () => {
-            statusMessage.textContent = 'Processing...';
-            statusMessage.className = 'mt-3 text-center fw-bold text-warning';
+            statusMessage.textContent = 'Analyzing face...';
+            statusMessage.className = 'mt-3 text-center fw-bold text-warning bg-dark-subtle';
             captureButton.disabled = true;
 
             const canvas = document.createElement('canvas');
@@ -83,29 +137,30 @@
 
             fetch('/Attendance/MarkAttendance', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ImageData: imageData })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     statusMessage.textContent = data.message;
-                    statusMessage.className = 'mt-3 text-center fw-bold text-success';
+                    statusMessage.className = 'mt-3 text-center fw-bold text-success bg-dark-subtle';
+                    // Re-enable button after short delay to allow more captures
                     setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                        captureButton.disabled = false;
+                        statusMessage.textContent = 'Ready for next capture.';
+                        statusMessage.className = 'mt-3 text-center fw-bold text-info bg-dark-subtle';
+                    }, 2000);
                 } else {
                     statusMessage.textContent = data.message;
-                    statusMessage.className = 'mt-3 text-center fw-bold text-danger';
+                    statusMessage.className = 'mt-3 text-center fw-bold text-danger bg-dark-subtle';
                     captureButton.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                statusMessage.textContent = 'An error occurred while communicating with the server.';
-                statusMessage.className = 'mt-3 text-center fw-bold text-danger';
+                statusMessage.textContent = 'Communication error.';
+                statusMessage.className = 'mt-3 text-center fw-bold text-danger bg-dark-subtle';
                 captureButton.disabled = false;
             });
         });
