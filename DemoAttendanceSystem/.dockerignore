@@ -1,0 +1,8 @@
+bin/
+obj/
+.git/
+.gitattributes
+*.md
+*.pdf
+DemoAAS/bin/
+DemoAAS/obj/

@@ -50,13 +50,12 @@ namespace DemoAAS.Services
         private DenseTensor<float> ConvertMatToTensor(Mat mat)
         {
             var tensor = new DenseTensor<float>(new[] { 1, 3, _inputSize, _inputSize });
-            mat.GetGenericIndexer<Vec3b>().GetData(out Vec3b[] data);
 
             for (int y = 0; y < _inputSize; y++)
             {
                 for (int x = 0; x < _inputSize; x++)
                 {
-                    var color = data[y * _inputSize + x];
+                    var color = mat.At<Vec3b>(y, x);
                     tensor[0, 0, y, x] = color.Item0; // R
                     tensor[0, 1, y, x] = color.Item1; // G
                     tensor[0, 2, y, x] = color.Item2; // B

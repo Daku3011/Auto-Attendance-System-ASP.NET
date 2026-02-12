@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  # ─── PostgreSQL Database ───────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: attendance-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: DemoAAS
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: daku123$
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── Auto Attendance System (ASP.NET Core) ─────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: attendance-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=db;Database=DemoAAS;Username=postgres;Password=daku123$$
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
