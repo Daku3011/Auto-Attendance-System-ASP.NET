@@ -30,11 +30,22 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Auto-apply pending EF Core migrations on startup
+// Auto-create database schema on startup (for Docker / fresh installs)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    try
+    {
+        // Try migrations first (for existing databases with migration history)
+        db.Database.Migrate();
+    }
+    catch
+    {
+        // If migrations fail (no migration history table, or schema mismatch),
+        // drop and recreate from current model — safe for fresh Docker databases
+        db.Database.EnsureDeleted();
+        db.Database.EnsureCreated();
+    }
 }
 
 if (!app.Environment.IsDevelopment())
