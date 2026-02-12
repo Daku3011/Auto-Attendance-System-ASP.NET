@@ -1,6 +1,6 @@
-<![CDATA[# 🤖 Auto Attendance System — Technical Documentation
+# 🤖 Auto Attendance System — Technical Documentation
 
-> **DemoAttendanceSystem** is the solution directory containing the ASP.NET Core MVC project (`DemoAAS`) that powers the entire facial recognition attendance pipeline.
+**DemoAttendanceSystem** is the solution directory containing the ASP.NET Core MVC project (`DemoAAS`) that powers the entire facial recognition attendance pipeline.
 
 ---
 
