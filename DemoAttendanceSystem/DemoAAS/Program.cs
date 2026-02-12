@@ -34,18 +34,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    try
-    {
-        // Try migrations first (for existing databases with migration history)
-        db.Database.Migrate();
-    }
-    catch
-    {
-        // If migrations fail (no migration history table, or schema mismatch),
-        // drop and recreate from current model — safe for fresh Docker databases
-        db.Database.EnsureDeleted();
-        db.Database.EnsureCreated();
-    }
+    db.Database.EnsureCreated();
 }
 
 if (!app.Environment.IsDevelopment())
