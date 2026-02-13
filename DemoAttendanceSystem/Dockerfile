@@ -21,12 +21,17 @@ RUN dotnet publish -c Release -o /app/publish -r linux-x64 --self-contained fals
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 
 # Install native dependencies required by OpenCvSharp4
+# Note: Debian 12 installs libtesseract5, but OpenCvSharp expects libtesseract.so.4
+# We create a symlink to trick it.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgdiplus \
     libc6-dev \
     libopencv-dev \
     libtesseract-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libgtk2.0-0 \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/lib/x86_64-linux-gnu/libtesseract.so.5 /usr/lib/x86_64-linux-gnu/libtesseract.so.4 \
+    && ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so.62 /usr/lib/x86_64-linux-gnu/libjpeg.so.8
 
 WORKDIR /app
 
