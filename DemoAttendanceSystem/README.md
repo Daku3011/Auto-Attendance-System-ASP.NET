@@ -109,6 +109,17 @@ Student ────────── StudentPhoto
 
 ---
 
+## 📋 Prerequisites
+
+| Requirement | Version |
+|:---|:---|
+| .NET SDK | 8.0+ |
+| PostgreSQL | 14+ |
+| Docker | 24.0+ (optional) |
+| Git LFS | 3.0+ (for cloning ONNX models) |
+
+---
+
 ## 🗄️ Database Setup
 
 The project uses **PostgreSQL** with Entity Framework Core Code-First migrations.
@@ -180,6 +191,33 @@ dotnet watch run --project DemoAAS
 # Production build
 dotnet publish DemoAAS -c Release -o ./publish
 ```
+
+## 🐳 Docker Support
+
+The application is fully containerized. You can run the entire stack (App + Database) using Docker Compose.
+
+### 1. Build and Run
+
+```bash
+# In the DemoAttendanceSystem directory
+docker-compose up --build -d
+```
+
+### 2. Access the Application
+
+- **URL**: `http://localhost:8080`
+- **Database**: Port `5433` (mapped from container `5432`)
+
+### 3. Environment Variables
+
+Configuration is handled in `docker-compose.yml`:
+
+```yaml
+environment:
+  - ASPNETCORE_ENVIRONMENT=Production
+  - ConnectionStrings__DefaultConnection=Host=db;Database=DemoAAS;Username=postgres;Password=daku123$
+```
+
 
 ### HTTPS / Camera Access
 
@@ -268,7 +306,3 @@ DemoAttendanceSystem/
 
 ---
 
-## 📄 License
-
-MIT License — see the root [LICENSE.md](../LICENSE.md) for details.
-]]>

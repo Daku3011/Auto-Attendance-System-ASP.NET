@@ -1,4 +1,4 @@
-<![CDATA[# 📋 Auto Attendance System — Development Roadmap
+# 📋 Auto Attendance System — Development Roadmap
 
 ## ✅ Completed
 
@@ -90,4 +90,4 @@
 - [ ] EF Core migration needed for `FaceEmbedding` column on fresh installs
 - [ ] No unit tests yet — add xUnit test project
 - [ ] Hardcoded similarity threshold — make it configurable via `appsettings.json`
-]]>
+

@@ -114,6 +114,9 @@ Auto-Attendance-System-ASP.NET/
 |:---|:---|
 | .NET SDK | 8.0+ |
 | PostgreSQL | 14+ |
+| Docker | 24.0+ (optional) |
+| Docker Compose | 2.0+ (optional) |
+
 | Git LFS | 3.0+ (for cloning ONNX models) |
 
 ### Installation
@@ -143,6 +146,21 @@ dotnet ef database update --project DemoAAS
 dotnet run --project DemoAAS
 ```
 
+### 🐳 Docker Deployment (Recommended)
+
+Run the entire stack (App + Database) with one command:
+
+```bash
+# Build and start services
+docker-compose up --build -d
+
+# View logs
+docker-compose logs -f
+```
+
+> The application will be available at `http://localhost:8080`.
+
+
 > 🌐 Open your browser at `https://localhost:5001` (or the port shown in the terminal).
 
 ---
@@ -170,19 +188,8 @@ Visit **Attendance Records** → filter by Classroom, Faculty, or Date Range →
 - [x] ASP.NET Core Identity authentication
 - [ ] Continuous "Live Mode" scanning without manual capture
 - [ ] Attendance analytics dashboard with charts
-- [ ] Docker containerization for one-command deployment
+- [x] Docker containerization for one-command deployment
 - [ ] Mobile-responsive PWA for tablet kiosks
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue first to discuss what you'd like to change.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ---
