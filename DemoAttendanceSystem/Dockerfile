@@ -6,30 +6,31 @@ WORKDIR /src
 
 # Copy project file and restore dependencies first (cache layer)
 COPY DemoAAS/DemoAAS.csproj DemoAAS/
-RUN dotnet restore DemoAAS/DemoAAS.csproj
+RUN dotnet restore DemoAAS/DemoAAS.csproj -r linux-x64
 
 # Copy the rest of the source code
 COPY . .
 
-# Publish the application
+# Publish the application with linux-x64 runtime to include native libs
 WORKDIR /src/DemoAAS
-RUN dotnet publish -c Release -o /app/publish --no-restore
+RUN dotnet publish -c Release -o /app/publish -r linux-x64 --self-contained false --no-restore
 
 # ============================================================
 # Stage 2: Runtime
 # ============================================================
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 
-# Install OpenCV native dependencies required by OpenCvSharp4
+# Install native dependencies required by OpenCvSharp4
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgdiplus \
     libc6-dev \
     libopencv-dev \
+    libtesseract-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy published application
+# Copy published application (includes runtimes/linux-x64/native/)
 COPY --from=build /app/publish .
 
 # Copy ONNX model files and other detection models
